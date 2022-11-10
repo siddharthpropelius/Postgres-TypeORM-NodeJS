@@ -9,12 +9,12 @@ export const getCategory = async (
     const find = await Category.find({
       relations: {
         restaurant: true,
-        foodlist: true,
+        fooditems: true,
       },
     });
-    res.send(find);
+    res.status(200).send({ data: find });
   } catch (err) {
-    res.send(err.message);
+    res.status(500).send(err.message);
   }
 };
 
@@ -33,12 +33,12 @@ export const addCategory = async (
         .orUpdate({ conflict_target: ['name'], overwrite: ['name'] })
         .returning('*')
         .execute();
-      res.send({ message: 'Category Added!' });
+      res.status(200).send({ message: 'Category Added!' });
     } else {
       res.status(400).send({ message: 'Category already exists!' });
     }
   } catch (err) {
-    res.send(err.message);
+    res.status(500).send(err.message);
   }
 };
 
@@ -60,7 +60,7 @@ export const deleteCategory = async (
       res.status(404).send({ message: 'Invalid query params!' });
     }
   } catch (err) {
-    res.status(400).send({ message: err.message });
+    res.status(500).send({ message: err.message });
   }
 };
 

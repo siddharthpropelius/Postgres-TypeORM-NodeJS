@@ -5,19 +5,18 @@ dotenv.config();
 
 const authenticateToken = (req: any, res: any, next: any) => {
   try {
-    const ACCESS_TOKEN = process.env.ACCESS_TOKEN;
+    const ACCESS_SECRET = process.env.ACCESS_SECRET;
     const authHeader = req.headers['authorization'];
-    if (authHeader && ACCESS_TOKEN) {
+    if (authHeader && ACCESS_SECRET) {
       const token = authHeader.split(' ')[1];
-      const verifyToken: any = jwt.verify(token, ACCESS_TOKEN);
+      const verifyToken: any = jwt.verify(token, ACCESS_SECRET);
       req.app.set('userId', verifyToken.userId);
       next();
     } else {
       res.status(401).send({ message: 'Unauthenticated user!' });
     }
   } catch (err) {
-    console.log(err);
-    res.status(400).send({ message: 'No token provided!' });
+    res.status(500).send({ message: 'No token provided!' });
   }
 };
 

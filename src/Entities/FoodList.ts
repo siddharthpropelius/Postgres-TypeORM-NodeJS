@@ -8,14 +8,12 @@ import {
   UpdateDateColumn,
   ManyToOne,
   OneToMany,
-  JoinColumn,
 } from 'typeorm';
 import { Restaurant } from '../Entities/Restaurant';
-import { Orders } from '../Entities/Orders';
 import { Items } from '../Entities/Items';
 
-@Entity('foodlist')
-export class FoodList extends BaseEntity {
+@Entity('foodItems')
+export class FoodItems extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
   @Column()
@@ -30,24 +28,16 @@ export class FoodList extends BaseEntity {
   created_at: Date;
   @UpdateDateColumn()
   updated_at: Date;
-  @ManyToOne(() => Category, (category) => category.foodlist, {
+  @ManyToOne(() => Category, (category) => category.fooditems, {
     onDelete: 'CASCADE',
     cascade: ['update'],
   })
   category: Category;
-  @ManyToOne(() => Restaurant, (restaurant) => restaurant.foodlist, {
+  @ManyToOne(() => Restaurant, (restaurant) => restaurant.fooditems, {
     onDelete: 'CASCADE',
   })
   restaurant: Restaurant;
 
-  @OneToMany(() => Items, (items) => items.foodlist)
+  @OneToMany(() => Items, (items) => items.fooditems)
   items: Items[];
-
-  // @OneToMany(() => Orders, (orders) => orders.foodlist, {
-  //   onDelete: 'CASCADE',
-  // })
-  // orders: Orders[];
-
-  // @OneToMany(() => Items, (items) => items.foodlist)
-  // items: Items[];
 }

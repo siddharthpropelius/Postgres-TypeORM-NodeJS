@@ -1,4 +1,4 @@
-import { FoodList } from '../Entities/FoodList';
+import { FoodItems } from '../Entities/FoodList';
 import {
   Entity,
   BaseEntity,
@@ -26,9 +26,9 @@ export class Category extends BaseEntity {
   @JoinTable()
   restaurant: Restaurant[];
 
-  @OneToMany(() => FoodList, (foodlist) => foodlist.category, {
+  @OneToMany(() => FoodItems, (fooditems) => fooditems.category, {
     onDelete: 'CASCADE',
   })
   @JoinColumn()
-  foodlist: FoodList[];
+  fooditems: FoodItems[];
 }

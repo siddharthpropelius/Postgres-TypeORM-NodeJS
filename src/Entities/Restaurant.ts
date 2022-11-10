@@ -7,12 +7,10 @@ import {
   UpdateDateColumn,
   ManyToMany,
   OneToMany,
-  JoinTable,
   JoinColumn,
 } from 'typeorm';
 import { Category } from './Category';
-import { FoodList } from './FoodList';
-import { Orders } from '../Entities/Orders';
+import { FoodItems } from './FoodList';
 
 @Entity('restaurant')
 export class Restaurant extends BaseEntity {
@@ -40,14 +38,10 @@ export class Restaurant extends BaseEntity {
   })
   category: Category[];
 
-  // @OneToMany(() => Orders, (orders) => orders.restaurant, {
-  //   onDelete: 'CASCADE',
-  // })
-  // orders: Orders[];
 
-  @OneToMany(() => FoodList, (foodlist) => foodlist.category, {
+  @OneToMany(() => FoodItems, (fooditems) => fooditems.category, {
     onDelete: 'CASCADE',
   })
   @JoinColumn()
-  foodlist: FoodList[];
+  fooditems: FoodItems[];
 }

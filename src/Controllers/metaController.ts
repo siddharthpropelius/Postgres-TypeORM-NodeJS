@@ -6,7 +6,7 @@ export const metaData = async (req: express.Request, res: express.Response) => {
     const find = await MetaData.find({});
     res.status(200).send({ data: find });
   } catch (err) {
-    res.status(400).send(err.message);
+    res.status(500).send(err.message);
   }
 };
 
@@ -24,7 +24,7 @@ export const byId = async (req: express.Request, res: express.Response) => {
       res.status(400).send({ message: 'Invalid query params' });
     }
   } catch (err) {
-    res.status(400).send(err.message);
+    res.status(500).send(err.message);
   }
 };
 
@@ -43,7 +43,7 @@ export const addMeta = async (req: express.Request, res: express.Response) => {
       res.status(400).send({ message: 'Meta already exists!' });
     }
   } catch (err) {
-    res.send(err.message);
+    res.status(500).send(err.message);
   }
 };
 
@@ -71,7 +71,7 @@ export const deleteMeta = async (
       res.status(400).send({ message: 'Invalid query params!' });
     }
   } catch (err) {
-    res.status(400).send({ message: err.message });
+    res.status(500).send({ message: err.message });
   }
 };
 

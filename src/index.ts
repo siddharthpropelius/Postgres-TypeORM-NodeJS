@@ -4,7 +4,7 @@ import { Restaurant } from './Entities/Restaurant';
 import { Category } from './Entities/Category';
 import { MetaData } from './Entities/MetaData';
 import { Orders } from './Entities/Orders';
-import { FoodList } from './Entities/FoodList';
+import { FoodItems } from './Entities/FoodList';
 
 import express from 'express';
 import cors from 'cors';
@@ -16,7 +16,6 @@ import { metaRouter } from './Routes/Metadata';
 import { ordersRouter } from './Routes/Orders';
 import { foodRouter } from './Routes/Foodlist';
 import { Items } from './Entities/Items';
-
 
 const app = express();
 const PORT = 5000;
@@ -31,22 +30,13 @@ const main = async () => {
     database: 'food_app',
     logging: false,
     synchronize: true,
-    entities: [
-      User,
-      Restaurant,
-      Category,
-      MetaData,
-      Orders,
-      FoodList,
-      Items,
-
-    ],
+    entities: [User, Restaurant, Category, MetaData, Orders, FoodItems, Items],
   });
 
   connection
     .initialize()
     .then(() => {
-      console.log(`Database has been connected`);
+      console.log(`DATABASE CONNECTED`);
       app.use(express.json());
       app.use(cors());
 
@@ -58,11 +48,11 @@ const main = async () => {
       app.use(foodRouter);
 
       app.listen(PORT, () => {
-        console.log(`SERVER IS STARTED ON ${PORT} ENJOY`);
+        console.log(`SERVER STARTED ON ${PORT}`);
       });
     })
     .catch((err) => {
-      console.error(`Database could not be connected `, err);
+      console.error(`DATABASE DOES NOT CONNECTED `, err);
     });
 };
 

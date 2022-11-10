@@ -9,7 +9,6 @@ import {
   OneToMany,
   JoinColumn,
 } from 'typeorm';
-import { IsEmail } from 'class-validator';
 
 @Entity('users')
 export class User extends BaseEntity {

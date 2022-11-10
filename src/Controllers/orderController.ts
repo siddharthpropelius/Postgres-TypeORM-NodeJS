@@ -1,7 +1,7 @@
 import express from 'express';
 import { Orders } from '../Entities/Orders';
 import { User } from '../Entities/User';
-import { FoodList } from '../Entities/FoodList';
+import { FoodItems } from '../Entities/FoodList';
 import { Items } from '../Entities/Items';
 
 export const orders = async (req: express.Request, res: express.Response) => {
@@ -14,7 +14,7 @@ export const orders = async (req: express.Request, res: express.Response) => {
       const find_user = await User.findOneBy({ id: +userId });
       if (find_user) {
         const orders = await Orders.find({
-          relations: { user: true, items: { foodlist: { restaurant: true } } },
+          relations: { user: true, items: { fooditems: { restaurant: true } } },
           where: { user: { id: +userId } },
         });
         res.status(200).send({ data: orders });
@@ -26,7 +26,7 @@ export const orders = async (req: express.Request, res: express.Response) => {
       if (find_order) {
         const orders = await Orders.find({
           where: { id: +orderId },
-          relations: { user: true, items: { foodlist: { restaurant: true } } },
+          relations: { user: true, items: { fooditems: { restaurant: true } } },
         });
         res.status(200).send({ data: orders });
       } else {
@@ -34,12 +34,12 @@ export const orders = async (req: express.Request, res: express.Response) => {
       }
     } else {
       const find = await Orders.find({
-        relations: { user: true, items: { foodlist: { restaurant: true } } },
+        relations: { user: true, items: { fooditems: { restaurant: true } } },
       });
-      res.send({ data: find });
+      res.status(200).send({ data: find });
     }
   } catch (err) {
-    res.status(400).send(err.message);
+    res.status(500).send(err.message);
   }
 };
 
@@ -59,7 +59,7 @@ export const deleteOrder = async (
       }
     }
   } catch (err) {
-    res.status(400).send({ message: err.message });
+    res.status(500).send({ message: err.message });
   }
 };
 export const addOrder = async (req: express.Request, res: express.Response) => {
@@ -71,7 +71,7 @@ export const addOrder = async (req: express.Request, res: express.Response) => {
       let subTotal = 0;
       let total = 0;
       for (let i = 0; i < items.length; i++) {
-        const find_food = await FoodList.findOneBy({ id: items[i].foodId });
+        const find_food = await FoodItems.findOneBy({ id: items[i].foodId });
         if (find_food)
           subTotal = subTotal + items[i].quantity * find_food.price;
       }
@@ -88,19 +88,19 @@ export const addOrder = async (req: express.Request, res: express.Response) => {
         .returning('*')
         .execute();
       items.map(async (item: any) => {
-        const find_food = await FoodList.findOneBy({ id: item.foodId });
+        const find_food = await FoodItems.findOneBy({ id: item.foodId });
         if (find_food && order) {
           const items = new Items();
           items.quantity = item.quantity;
-          items.foodlist = find_food;
+          items.fooditems = find_food;
           items.orders = order.raw;
           await Items.save(items);
         }
       });
-      res.send({ message: 'Order placed!' });
+      res.status(200).send({ message: 'Order placed!' });
     }
   } catch (err) {
-    res.send({ err });
+    res.status(500).send({ err });
   }
 };
 module.exports = { orders, deleteOrder, addOrder };

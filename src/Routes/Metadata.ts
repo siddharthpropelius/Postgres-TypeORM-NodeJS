@@ -5,16 +5,15 @@ import {
   addMeta,
   deleteMeta,
 } from '../Controllers/metaController';
-import authenticateToken from '../Middleware/authenticateToken';
 
 const router = express.Router();
 
-router.get('/api/meta', authenticateToken, metaData);
+router.get('/api/meta', metaData);
 
-router.get('/api/meta/by-id', authenticateToken, byId);
+router.get('/api/meta/by-id', byId);
 
-router.post('/api/meta', authenticateToken, addMeta);
+router.post('/api/meta', addMeta);
 
-router.delete('/api/meta', authenticateToken, deleteMeta);
+router.delete('/api/meta', deleteMeta);
 
 export { router as metaRouter };

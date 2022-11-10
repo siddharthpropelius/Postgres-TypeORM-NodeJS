@@ -8,11 +8,11 @@ export const restaurant = async (
 ) => {
   try {
     const find = await Restaurant.find({
-      relations: { category: true, foodlist: true },
+      relations: { category: true, fooditems: true },
     });
-    res.send({ data: find });
+    res.status(200).send({ data: find });
   } catch (err) {
-    res.send(err.message);
+    res.status(500).send(err.message);
   }
 };
 
@@ -27,12 +27,12 @@ export const restaurantById = async (
         where: {
           id: +restaurantId,
         },
-        relations: { category: true, foodlist: true },
+        relations: { category: true, fooditems: true },
       });
       res.status(200).send({ data: find });
     }
   } catch (err) {
-    res.status(400).send(err.message);
+    res.status(500).send(err.message);
   }
 };
 
@@ -61,7 +61,7 @@ export const addRestaurant = async (
     await Restaurant.save(restaurant);
     res.status(200).send({ message: 'Added!' });
   } catch (err) {
-    res.status(400).send(err.message);
+    res.status(500).send(err.message);
   }
 };
 
@@ -81,7 +81,7 @@ export const deleteRestaurant = async (
       }
     }
   } catch (err) {
-    res.status(400).send({ message: err.message });
+    res.status(500).send({ message: err.message });
   }
 };
 
@@ -119,7 +119,7 @@ export const linkCategory = async (
       }
     }
   } catch (err) {
-    res.status(400).send({ message: err.message });
+    res.status(500).send({ message: err.message });
   }
 };
 
@@ -130,7 +130,6 @@ export const updateRestaurant = async (
   try {
     const { restaurantId } = req.query;
     if (restaurantId) {
-      console.log(req.query);
       await Restaurant.createQueryBuilder()
         .update(Restaurant)
         .set(req.body)
@@ -139,13 +138,15 @@ export const updateRestaurant = async (
         .execute();
       res.status(200).send({ message: `Restaurant Updated with ${req.body}` });
     } else {
-      console.log('Invalid query params');
+      res.status(404).send({ message: 'Restaurant does not found!' });
     }
   } catch (err) {
     if (err.code == 23505) {
-      res.status(400).send({ message: 'Restaurant already exists' });
+      res
+        .status(400)
+        .send({ message: `${req.body.name} restaurant already exists` });
     } else {
-      res.status(400).send({ message: 'Something went wrong!' });
+      res.status(500).send({ message: 'Something went wrong!' });
     }
   }
 };
@@ -179,7 +180,7 @@ export const deleteCategory = async (
       res.status(400).send({ message: 'Invalid query params!' });
     }
   } catch (err) {
-    res.status(400).send({ message: err.message });
+    res.status(500).send({ message: err.message });
   }
 };
 
