@@ -41,25 +41,37 @@ export const addRestaurant = async (
   res: express.Response
 ) => {
   try {
-    const { name, img, des, opens_at, close_at, location, category } = req.body;
-    const categories = await Category.createQueryBuilder()
-      .insert()
-      .into(Category)
-      .values(category)
-      .orUpdate({ conflict_target: ['name'], overwrite: ['name'] })
-      .returning('*')
-      .execute();
+    const { name, img, description, opens_at, close_at, location, category } =
+      req.body;
+    if (
+      typeof name == 'string' &&
+      typeof img == 'string' &&
+      typeof description == 'string' &&
+      typeof location == 'string' &&
+      typeof opens_at == 'number' &&
+      typeof close_at == 'number'
+    ) {
+      const categories = await Category.createQueryBuilder()
+        .insert()
+        .into(Category)
+        .values(category)
+        .orUpdate({ conflict_target: ['name'], overwrite: ['name'] })
+        .returning('*')
+        .execute();
 
-    const restaurant = new Restaurant();
-    restaurant.name = name;
-    restaurant.img = img;
-    restaurant.des = des;
-    restaurant.opens_at = opens_at;
-    restaurant.close_at = close_at;
-    restaurant.location = location;
-    restaurant.category = categories.raw;
-    await Restaurant.save(restaurant);
-    res.status(200).send({ message: 'Added!' });
+      const restaurant = new Restaurant();
+      restaurant.name = name;
+      restaurant.img = img;
+      restaurant.description = description;
+      restaurant.opens_at = opens_at;
+      restaurant.close_at = close_at;
+      restaurant.location = location;
+      restaurant.category = categories.raw;
+      await Restaurant.save(restaurant);
+      res.status(200).send({ message: 'Added!' });
+    } else {
+      res.status(400).send({ message: 'Invalid input!' });
+    }
   } catch (err) {
     res.status(500).send(err.message);
   }
@@ -136,7 +148,7 @@ export const updateRestaurant = async (
         .where('id = :id', { id: +restaurantId })
         .returning('*')
         .execute();
-      res.status(200).send({ message: `Restaurant Updated with ${req.body}` });
+      res.status(200).send({ message: `Restaurant Updated!` });
     } else {
       res.status(404).send({ message: 'Restaurant does not found!' });
     }

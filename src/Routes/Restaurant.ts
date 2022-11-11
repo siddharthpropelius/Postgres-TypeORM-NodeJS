@@ -9,6 +9,7 @@ import {
   linkCategory,
   deleteCategory,
 } from '../Controllers/restaurantController';
+
 import authenticateToken from '../Middleware/authenticateToken';
 
 router.get('/api/restaurant', authenticateToken, restaurant);
@@ -19,13 +20,29 @@ router.get(
   restaurantById
 );
 
-router.post('/api/restaurant', authenticateToken, addRestaurant);
+router.post(
+  '/api/restaurant',
+  authenticateToken,
+  addRestaurant
+);
 
-router.delete('/api/restaurant/', authenticateToken, deleteRestaurant);
+router.delete(
+  '/api/restaurant/',
+  authenticateToken,
+  deleteRestaurant
+);
 
-router.post('/api/restaurant/link', authenticateToken, linkCategory);
+router.post(
+  '/api/restaurant/link',
+  authenticateToken,
+  linkCategory
+);
 
-router.put('/api/restaurant/', authenticateToken, updateRestaurant);
+router.patch(
+  '/api/restaurant/',
+  authenticateToken,
+  updateRestaurant
+);
 
 router.delete(
   '/api/restaurant/delete-category',

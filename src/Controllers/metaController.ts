@@ -30,17 +30,31 @@ export const byId = async (req: express.Request, res: express.Response) => {
 
 export const addMeta = async (req: express.Request, res: express.Response) => {
   try {
-    const { metaName, metaDescription, metaAuthor, metaKeyword } = req.body;
-    const find_meta = await MetaData.findOneBy({ metaName: metaName });
-    if (!find_meta) {
-      MetaData.createQueryBuilder()
-        .insert()
-        .into(MetaData)
-        .values(req.body)
-        .execute();
-      res.status(200).send({ message: 'Meta Added!' });
+    const { name, description, author, keywords } = req.body;
+    if (
+      typeof name == 'string' &&
+      typeof description == 'string' &&
+      typeof author == 'string' &&
+      typeof keywords == 'string'
+    ) {
+      const find_meta = await MetaData.findOneBy({ name: name });
+      if (!find_meta) {
+        MetaData.createQueryBuilder()
+          .insert()
+          .into(MetaData)
+          .values({
+            name: name,
+            description: description,
+            author: author,
+            keywords: keywords,
+          })
+          .execute();
+        res.status(200).send({ message: 'Meta Added!' });
+      } else {
+        res.status(400).send({ message: 'Meta already exists!' });
+      }
     } else {
-      res.status(400).send({ message: 'Meta already exists!' });
+      res.status(400).send({ message: 'Invalid input' });
     }
   } catch (err) {
     res.status(500).send(err.message);

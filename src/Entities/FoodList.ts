@@ -21,7 +21,7 @@ export class FoodItems extends BaseEntity {
   @Column()
   img: string;
   @Column()
-  des: string;
+  description: string;
   @Column()
   price: number;
   @CreateDateColumn()

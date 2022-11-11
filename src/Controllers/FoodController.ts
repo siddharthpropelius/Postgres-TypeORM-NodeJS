@@ -20,6 +20,10 @@ export const food = async (req: express.Request, res: express.Response) => {
           },
         });
         res.status(200).send({ data: foods });
+      } else {
+        res
+          .status(404)
+          .send({ message: 'Restaurant or Category does not found!' });
       }
     } else if (restaurantId) {
       const find_restaurant = await Restaurant.findOneBy({ id: +restaurantId });
@@ -40,6 +44,8 @@ export const food = async (req: express.Request, res: express.Response) => {
           where: { category: { id: +categoryId } },
         });
         res.status(200).send({ data: foods });
+      } else {
+        res.status(400).send({ message: 'Category does not found!' });
       }
     } else if (foodId) {
       const find_food = await FoodItems.findOneBy({ id: +foodId });
@@ -49,7 +55,7 @@ export const food = async (req: express.Request, res: express.Response) => {
         });
         res.status(200).send({ data: orders });
       } else {
-        res.status(404).send({ message: 'Food does not exists!' });
+        res.status(404).send({ message: 'Food does not found!' });
       }
     } else {
       const find = await FoodItems.find({
@@ -64,33 +70,48 @@ export const food = async (req: express.Request, res: express.Response) => {
 
 export const addFood = async (req: express.Request, res: express.Response) => {
   try {
-    const { name, category, price, img, des, rId } = req.body;
-    const find_restaurant = await Restaurant.findOneBy({ id: rId });
-    const find_category = await Category.findOneBy({ name: category });
-    const find = await Restaurant.find({
-      relations: { category: true },
-      where: {
-        id: rId,
-        category: {
-          name: category,
-        },
-      },
-    });
+    const { restaurantId } = req.query;
+    const { name, categoryId, price, img, description } = req.body;
+    if (
+      typeof name == 'string' &&
+      typeof categoryId == 'number' &&
+      typeof price == 'number' &&
+      typeof img == 'string' &&
+      typeof description == 'string'
+    ) {
+      if (restaurantId) {
+        const find_restaurant = await Restaurant.findOneBy({
+          id: +restaurantId,
+        });
+        const find_category = await Category.findOneBy({ id: categoryId });
+        const find = await Restaurant.find({
+          relations: { category: true },
+          where: {
+            id: +restaurantId,
+            category: {
+              id: categoryId,
+            },
+          },
+        });
 
-    if (find.length && find_restaurant && find_category) {
-      const food = new FoodItems();
-      food.name = name;
-      food.price = price;
-      food.img = img;
-      food.des = des;
-      food.restaurant = find_restaurant;
-      food.category = find_category;
-      await FoodItems.save(food);
-      res.status(200).send({ message: 'Food Added!' });
+        if (find.length && find_restaurant && find_category) {
+          const food = new FoodItems();
+          food.name = name;
+          food.price = price;
+          food.img = img;
+          food.description = description;
+          food.restaurant = find_restaurant;
+          food.category = find_category;
+          await FoodItems.save(food);
+          res.status(200).send({ message: 'Food Added!' });
+        } else {
+          res
+            .status(404)
+            .send({ message: 'Restaurant or Category does not found!' });
+        }
+      }
     } else {
-      res
-        .status(404)
-        .send({ message: 'Restaurant or Category does not exists!' });
+      res.status(400).send({ message: 'Invalid input!' });
     }
   } catch (err) {
     res.status(500).send(err.message);
@@ -112,7 +133,7 @@ export const deleteFood = async (
         .execute();
       res.status(200).send({ message: 'Food Item Deleted!' });
     } else {
-      res.status(404).send({ message: 'Food does not exists!' });
+      res.status(404).send({ message: 'Food does not found!' });
     }
   } catch (err) {
     res.status(500).send({ message: err.message });

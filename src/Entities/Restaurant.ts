@@ -21,7 +21,7 @@ export class Restaurant extends BaseEntity {
   @Column()
   img: string;
   @Column()
-  des: string;
+  description: string;
   @Column()
   opens_at: number;
   @Column()
@@ -37,7 +37,6 @@ export class Restaurant extends BaseEntity {
     onDelete: 'CASCADE',
   })
   category: Category[];
-
 
   @OneToMany(() => FoodItems, (fooditems) => fooditems.category, {
     onDelete: 'CASCADE',

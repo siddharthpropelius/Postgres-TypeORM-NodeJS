@@ -1,9 +1,11 @@
 import express from 'express';
+import { body, check } from 'express-validator';
 import {
   getCategory,
   addCategory,
   deleteCategory,
 } from '../Controllers/categoryController';
+
 import authenticateToken from '../Middleware/authenticateToken';
 
 const router = express.Router();

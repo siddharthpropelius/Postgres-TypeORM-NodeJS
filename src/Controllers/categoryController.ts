@@ -1,4 +1,5 @@
 import express from 'express';
+import { body } from 'express-validator';
 import { Category } from '../Entities/Category';
 
 export const getCategory = async (
@@ -24,18 +25,22 @@ export const addCategory = async (
 ) => {
   try {
     const { name } = req.body;
-    const find_category = await Category.findOneBy({ name: name });
-    if (!find_category) {
-      await Category.createQueryBuilder()
-        .insert()
-        .into(Category)
-        .values({ name: name })
-        .orUpdate({ conflict_target: ['name'], overwrite: ['name'] })
-        .returning('*')
-        .execute();
-      res.status(200).send({ message: 'Category Added!' });
+    if (typeof name !== 'string') {
+      res.status(400).send({ message: 'invalid input' });
     } else {
-      res.status(400).send({ message: 'Category already exists!' });
+      const find_category = await Category.findOneBy({ name: name });
+      if (!find_category) {
+        await Category.createQueryBuilder()
+          .insert()
+          .into(Category)
+          .values({ name: name })
+          .orUpdate({ conflict_target: ['name'], overwrite: ['name'] })
+          .returning('*')
+          .execute();
+        res.status(200).send({ message: 'Category Added!' });
+      } else {
+        res.status(400).send({ message: 'Category already exists!' });
+      }
     }
   } catch (err) {
     res.status(500).send(err.message);

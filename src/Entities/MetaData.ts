@@ -11,15 +11,22 @@ import {
 export class MetaData extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
+
   @Column({ unique: true })
-  metaName: string;
+  name: string;
+
   @Column()
-  metaDescription: string;
-  metaAuthor: string;
+  description: string;
+
   @Column()
-  metaKeyword: string;
+  author: string;
+
+  @Column()
+  keywords: string;
+
   @CreateDateColumn()
   created_at: Date;
+
   @UpdateDateColumn()
   updated_at: Date;
 }

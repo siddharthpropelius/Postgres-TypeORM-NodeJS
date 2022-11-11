@@ -1,6 +1,6 @@
 import * as dotenv from 'dotenv';
 import { User } from '../Entities/User';
-import express from 'express';
+import express, { application } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { validationResult } from 'express-validator';
@@ -17,12 +17,27 @@ export const users = async (req: express.Request, res: express.Response) => {
   }
 };
 
+export const userById = async (req: express.Request, res: express.Response) => {
+  try {
+    const userId = req.app.get('userId');
+    const find_user = await User.findOneBy({ id: userId });
+    if (find_user) {
+      res.status(200).send({ data: find_user });
+    } else {
+      res.status(404).send({ message: 'User not found!' });
+    }
+  } catch (err) {
+    res.status(500).send({ message: err.message });
+  }
+};
+
 export const userLogin = async (
   req: express.Request,
   res: express.Response
 ) => {
   try {
     const errors = validationResult(req);
+    console.log(errors);
     if (!errors.isEmpty()) {
       res.status(400).send({ errors });
     } else {
@@ -44,7 +59,7 @@ export const userLogin = async (
               email: findUser.email,
             },
             process.env.ACCESS_SECRET,
-            { expiresIn: '1h' }
+            { expiresIn: '15m' }
           );
           const generateRefreshToken = jwt.sign(
             {
@@ -83,12 +98,30 @@ export const addUser = async (req: express.Request, res: express.Response) => {
       if (!existing) {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
-        User.createQueryBuilder()
+        const user = await User.createQueryBuilder()
           .insert()
           .into(User)
           .values({ name: name, email: email, password: hashedPassword })
+          .returning('*')
           .execute();
-        res.status(200).send({ message: 'User created!' });
+        if (process.env.ACCESS_SECRET && process.env.REFRESH_SECRET) {
+          const generateAccessToken = jwt.sign(
+            { userId: user.raw[0].id, email: user.raw[0].email },
+            process.env.ACCESS_SECRET,
+            { expiresIn: '15m' }
+          );
+          const generateRefreshToken = jwt.sign(
+            { userId: user.raw[0].id, email: user.raw[0].email },
+            process.env.REFRESH_SECRET,
+            { expiresIn: '30d' }
+          );
+          refreshTokens.push(generateRefreshToken);
+          res.status(200).send({
+            user: user.raw[0],
+            accessToken: generateAccessToken,
+            refreshToken: generateRefreshToken,
+          });
+        }
       } else {
         res.status(400).send({ message: 'User Already Exists' });
       }
@@ -157,7 +190,7 @@ export const refreshToken = async (
         message: 'No refresh token available to generate access token',
       });
     if (!refreshToken.includes(refreshToken)) {
-      res.status(401).send({ message: 'Unauthenticated user' });
+      res.status(401).send({ message: 'Unauthenticated request' });
     } else if (process.env.REFRESH_SECRET && process.env.ACCESS_SECRET) {
       const validRefreshToken: any = jwt.verify(
         refreshToken,
@@ -181,4 +214,5 @@ module.exports = {
   updatePassword,
   deleteUser,
   refreshToken,
+  userById,
 };
