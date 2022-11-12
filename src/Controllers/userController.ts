@@ -37,7 +37,6 @@ export const userLogin = async (
 ) => {
   try {
     const errors = validationResult(req);
-    console.log(errors);
     if (!errors.isEmpty()) {
       res.status(400).send({ errors });
     } else {

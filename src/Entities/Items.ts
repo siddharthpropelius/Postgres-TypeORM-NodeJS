@@ -14,6 +14,7 @@ import { FoodItems } from '../Entities/FoodList';
 export class Items extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
+
   @Column()
   quantity: number;
 
@@ -21,6 +22,8 @@ export class Items extends BaseEntity {
   @JoinTable()
   orders: Orders[];
 
-  @ManyToOne(() => FoodItems, (fooditems) => fooditems.items)
+  @ManyToOne(() => FoodItems, (fooditems) => fooditems.items, {
+    onDelete: 'CASCADE',
+  })
   fooditems: FoodItems;
 }

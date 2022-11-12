@@ -5,6 +5,7 @@ import { Category } from './Entities/Category';
 import { MetaData } from './Entities/MetaData';
 import { Orders } from './Entities/Orders';
 import { FoodItems } from './Entities/FoodList';
+import { Items } from './Entities/Items';
 
 import express from 'express';
 import cors from 'cors';
@@ -15,7 +16,6 @@ import { categoryRouter } from './Routes/Category';
 import { metaRouter } from './Routes/Metadata';
 import { ordersRouter } from './Routes/Orders';
 import { foodRouter } from './Routes/Foodlist';
-import { Items } from './Entities/Items';
 
 const app = express();
 const PORT = 5000;
@@ -28,7 +28,6 @@ const main = async () => {
     username: 'postgres',
     password: '1234',
     database: 'food_app',
-    logging: false,
     synchronize: true,
     entities: [User, Restaurant, Category, MetaData, Orders, FoodItems, Items],
   });

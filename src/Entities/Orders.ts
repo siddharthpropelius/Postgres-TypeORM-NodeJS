@@ -15,14 +15,19 @@ import { Items } from '../Entities/Items';
 export class Orders extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
+
   @Column()
   discount: number;
+
   @Column()
   subtotal: number;
+
   @Column()
   total: number;
+
   @CreateDateColumn()
   created_at: Date;
+  
   @UpdateDateColumn()
   updated_at: Date;
 

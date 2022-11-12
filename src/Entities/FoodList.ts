@@ -16,28 +16,38 @@ import { Items } from '../Entities/Items';
 export class FoodItems extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
+
   @Column()
   name: string;
+
   @Column()
   img: string;
+
   @Column()
   description: string;
+
   @Column()
   price: number;
+
   @CreateDateColumn()
   created_at: Date;
+
   @UpdateDateColumn()
   updated_at: Date;
+
   @ManyToOne(() => Category, (category) => category.fooditems, {
     onDelete: 'CASCADE',
     cascade: ['update'],
   })
   category: Category;
+
   @ManyToOne(() => Restaurant, (restaurant) => restaurant.fooditems, {
     onDelete: 'CASCADE',
   })
   restaurant: Restaurant;
 
-  @OneToMany(() => Items, (items) => items.fooditems)
+  @OneToMany(() => Items, (items) => items.fooditems, {
+    onDelete: 'CASCADE',
+  })
   items: Items[];
 }

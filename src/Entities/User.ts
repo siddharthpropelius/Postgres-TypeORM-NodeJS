@@ -16,14 +16,19 @@ export class User extends BaseEntity {
   id: number;
   @Column()
   name: string;
+
   @Column({ unique: true })
   email: string;
+
   @Column()
   password: string;
+
   @CreateDateColumn()
   created_at: Date;
+
   @UpdateDateColumn()
   updated_at: Date;
+
   @OneToMany(() => Orders, (orders) => orders.user, {
     onDelete: 'CASCADE',
   })

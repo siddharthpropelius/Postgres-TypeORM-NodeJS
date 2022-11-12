@@ -52,6 +52,7 @@ export const food = async (req: express.Request, res: express.Response) => {
       if (find_food) {
         const orders = await FoodItems.find({
           where: { id: +foodId },
+          relations: { restaurant: true },
         });
         res.status(200).send({ data: orders });
       } else {
@@ -70,48 +71,58 @@ export const food = async (req: express.Request, res: express.Response) => {
 
 export const addFood = async (req: express.Request, res: express.Response) => {
   try {
-    const { restaurantId } = req.query;
-    const { name, categoryId, price, img, description } = req.body;
-    if (
-      typeof name == 'string' &&
-      typeof categoryId == 'number' &&
-      typeof price == 'number' &&
-      typeof img == 'string' &&
-      typeof description == 'string'
-    ) {
-      if (restaurantId) {
-        const find_restaurant = await Restaurant.findOneBy({
-          id: +restaurantId,
-        });
-        const find_category = await Category.findOneBy({ id: categoryId });
-        const find = await Restaurant.find({
-          relations: { category: true },
-          where: {
-            id: +restaurantId,
-            category: {
-              id: categoryId,
-            },
-          },
-        });
+    // const { restaurantId, categoryId } = req.query;
+    const { restaurantId, categoryId, name, price, img, description } =
+      req.body;
 
-        if (find.length && find_restaurant && find_category) {
-          const food = new FoodItems();
-          food.name = name;
-          food.price = price;
-          food.img = img;
-          food.description = description;
-          food.restaurant = find_restaurant;
-          food.category = find_category;
-          await FoodItems.save(food);
-          res.status(200).send({ message: 'Food Added!' });
-        } else {
-          res
-            .status(404)
-            .send({ message: 'Restaurant or Category does not found!' });
-        }
+    if (restaurantId && categoryId) {
+      const find_restaurant = await Restaurant.findOneBy({
+        id: +restaurantId,
+      });
+      const find_category = await Category.findOneBy({ id: +categoryId });
+      const find = await Restaurant.find({
+        relations: { category: true },
+        where: {
+          id: +restaurantId,
+          category: {
+            id: +categoryId,
+          },
+        },
+      });
+      if (find) {
+        console.log(find);
       }
-    } else {
-      res.status(400).send({ message: 'Invalid input!' });
+
+      if (find.length && find_restaurant && find_category) {
+        const food = await FoodItems.createQueryBuilder()
+          .insert()
+          .into(FoodItems)
+          .values({
+            name: name,
+            price: price,
+            img: img,
+            description: description,
+            restaurant: find_restaurant,
+            category: find_category,
+          })
+          .returning('*')
+          .execute();
+        console.log(food);
+        // const food = new FoodItems();
+        // food.name = name;
+        // food.price = price;
+        // food.img = img;
+        // food.description = description;
+        // food.restaurant = find_restaurant;
+        // food.category = find_category;
+        // console.log(food);
+        // await FoodItems.save(food);
+        res.status(200).send({ message: 'Food Added!' });
+      } else {
+        res
+          .status(404)
+          .send({ message: 'Restaurant or Category does not found!' });
+      }
     }
   } catch (err) {
     res.status(500).send(err.message);

@@ -66,7 +66,6 @@ export const addOrder = async (req: express.Request, res: express.Response) => {
   try {
     const userId = req.app.get('userId');
     const { items, discount } = req.body;
-    console.log(typeof items);
     const find_userId = await User.findOneBy({ id: userId });
     if (find_userId) {
       let subTotal = 0;

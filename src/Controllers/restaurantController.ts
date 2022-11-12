@@ -7,9 +7,8 @@ export const restaurant = async (
   res: express.Response
 ) => {
   try {
-    const find = await Restaurant.find({
-      relations: { category: true, fooditems: true },
-    });
+    const find = await Restaurant.find({ relations: { fooditems: true ,category:true} });
+    console.log(find)
     res.status(200).send({ data: find });
   } catch (err) {
     res.status(500).send(err.message);
@@ -23,7 +22,7 @@ export const restaurantById = async (
   try {
     const { restaurantId } = req.query;
     if (restaurantId) {
-      const find = await Restaurant.find({
+      const find = await Restaurant.findOne({
         where: {
           id: +restaurantId,
         },
