@@ -12,11 +12,11 @@ import {
 
 import authenticateToken from '../Middleware/authenticateToken';
 
-router.get('/api/restaurant', authenticateToken, restaurant);
+router.get('/api/restaurant', restaurant);
 
 router.get(
   '/api/restaurant/by-restaurantId',
-  authenticateToken,
+ authenticateToken,
   restaurantById
 );
 

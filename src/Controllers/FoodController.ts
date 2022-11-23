@@ -151,4 +151,44 @@ export const deleteFood = async (
   }
 };
 
-module.exports = { food, addFood, deleteFood };
+export const searchFood = async (
+  req: express.Request,
+  res: express.Response
+) => {
+  try {
+    const { searchTerm } = req.query;
+
+    const result = await FoodItems.createQueryBuilder('fooditems')
+      .select()
+      .innerJoin(Category, 'category', 'category.id = fooditems.categoryId')
+      .where('fooditems.name ILIKE :searchTerm', {
+        searchTerm: `%${searchTerm}%`,
+      })
+      .orWhere('category.name ILIKE :searchTerm', {
+        searchTerm: `%${searchTerm}%`,
+      })
+      .getMany();
+    res.status(200).send({ data: result });
+  } catch (err) {
+    res.status(500).send({ message: err.message });
+  }
+};
+
+export const getFoodPagination = async (
+  req: express.Request,
+  res: express.Response
+) => {
+  try {
+    const findfood = await FoodItems.createQueryBuilder()
+      .select('foodItems')
+      .from(FoodItems, 'foodItems')
+      .orderBy('RANDOM()')
+      .limit(6)
+      .getMany();
+    res.send(findfood);
+  } catch (e) {
+    res.status(500).send({ error: e.message });
+  }
+};
+
+module.exports = { food, addFood, deleteFood, searchFood, getFoodPagination };

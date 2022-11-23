@@ -23,11 +23,10 @@ router.post('/api/user', addUserValidate, addUser);
 router.put(
   '/api/user/update-password',
   updatePasswordValidate,
-  authenticateToken,
   updatePassword
 );
 router.delete('/api/user', authenticateToken, deleteUser);
-router.get('/api/refresh-token', refreshToken);
+router.post('/api/refresh-token', refreshToken);
 router.get('/api/user', authenticateToken, userById);
 
 export { router as userRouter };

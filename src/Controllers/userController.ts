@@ -1,9 +1,9 @@
-import * as dotenv from 'dotenv';
-import { User } from '../Entities/User';
-import express, { application } from 'express';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import { validationResult } from 'express-validator';
+import * as dotenv from "dotenv";
+import { User } from "../Entities/User";
+import express, { application } from "express";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import { validationResult } from "express-validator";
 
 dotenv.config();
 let refreshTokens: any = [];
@@ -19,12 +19,12 @@ export const users = async (req: express.Request, res: express.Response) => {
 
 export const userById = async (req: express.Request, res: express.Response) => {
   try {
-    const userId = req.app.get('userId');
+    const userId = req.app.get("userId");
     const find_user = await User.findOneBy({ id: userId });
     if (find_user) {
       res.status(200).send({ data: find_user });
     } else {
-      res.status(404).send({ message: 'User not found!' });
+      res.status(404).send({ message: "User not found!" });
     }
   } catch (err) {
     res.status(500).send({ message: err.message });
@@ -58,7 +58,7 @@ export const userLogin = async (
               email: findUser.email,
             },
             process.env.ACCESS_SECRET,
-            { expiresIn: '15m' }
+            { expiresIn: "30m" }
           );
           const generateRefreshToken = jwt.sign(
             {
@@ -66,7 +66,7 @@ export const userLogin = async (
               email: findUser.email,
             },
             process.env.REFRESH_SECRET,
-            { expiresIn: '30d' }
+            { expiresIn: "30d" }
           );
           refreshTokens.push(generateRefreshToken);
           res.status(200).send({
@@ -75,10 +75,10 @@ export const userLogin = async (
             refreshToken: generateRefreshToken,
           });
         } else {
-          res.status(400).send({ message: 'Invalid password!' });
+          res.status(401).send({ message: "Invalid password!" });
         }
       } else {
-        res.status(404).send({ message: 'User not found!' });
+        res.status(404).send({ message: "User not found!" });
       }
     }
   } catch (err) {
@@ -101,18 +101,18 @@ export const addUser = async (req: express.Request, res: express.Response) => {
           .insert()
           .into(User)
           .values({ name: name, email: email, password: hashedPassword })
-          .returning('*')
+          .returning("*")
           .execute();
         if (process.env.ACCESS_SECRET && process.env.REFRESH_SECRET) {
           const generateAccessToken = jwt.sign(
             { userId: user.raw[0].id, email: user.raw[0].email },
             process.env.ACCESS_SECRET,
-            { expiresIn: '15m' }
+            { expiresIn: "30m" }
           );
           const generateRefreshToken = jwt.sign(
             { userId: user.raw[0].id, email: user.raw[0].email },
             process.env.REFRESH_SECRET,
-            { expiresIn: '30d' }
+            { expiresIn: "30d" }
           );
           refreshTokens.push(generateRefreshToken);
           res.status(200).send({
@@ -122,7 +122,7 @@ export const addUser = async (req: express.Request, res: express.Response) => {
           });
         }
       } else {
-        res.status(400).send({ message: 'User Already Exists' });
+        res.status(401).send({ message: "User Already Exists" });
       }
     }
   } catch (err) {
@@ -135,7 +135,7 @@ export const updatePassword = async (
   res: express.Response
 ) => {
   try {
-    const userId = req.app.get('userId');
+    const userId = req.app.get("userId");
     const { password } = req.query;
 
     if (userId && password) {
@@ -146,12 +146,12 @@ export const updatePassword = async (
         await User.update({ id: +userId }, { password: hashedPassword });
         res
           .status(200)
-          .send({ message: 'Password has been updated successfully!' });
+          .send({ message: "Password has been updated successfully!" });
       } else {
         res.status(404).send({ message: "User doesn't exists!" });
       }
     } else {
-      res.status(500).send({ message: 'Something went wrong!' });
+      res.status(500).send({ message: "Something went wrong!" });
     }
   } catch (err) {
     res.status(500).send(err.message);
@@ -168,9 +168,9 @@ export const deleteUser = async (
       const user = await User.findOneBy({ id: +userId });
       if (user) {
         await User.delete({ id: +userId });
-        res.status(200).send({ message: 'User Deleted!' });
+        res.status(200).send({ message: "User Deleted!" });
       } else {
-        res.status(404).send({ message: 'User does not found!' });
+        res.status(404).send({ message: "User does not found!" });
       }
     }
   } catch (err) {
@@ -186,10 +186,10 @@ export const refreshToken = async (
     const { refreshToken } = req.body;
     if (refreshToken == null)
       res.status(400).send({
-        message: 'No refresh token available to generate access token',
+        message: "No refresh token available to generate access token",
       });
     if (!refreshToken.includes(refreshToken)) {
-      res.status(401).send({ message: 'Unauthenticated request' });
+      res.status(401).send({ message: "Unauthenticated request" });
     } else if (process.env.REFRESH_SECRET && process.env.ACCESS_SECRET) {
       const validRefreshToken: any = jwt.verify(
         refreshToken,
@@ -199,7 +199,11 @@ export const refreshToken = async (
         { userId: validRefreshToken.userId, email: validRefreshToken.email },
         process.env.ACCESS_SECRET
       );
-      res.status(200).send({ newAccessToken });
+      const newRefreshToken = jwt.sign(
+        { userId: validRefreshToken.userId, email: validRefreshToken.email },
+        process.env.REFRESH_SECRET
+      );
+      res.status(200).send({ newAccessToken, newRefreshToken });
     }
   } catch (err) {
     res.status(500).send({ message: err.message });
